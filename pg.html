@@ -146,161 +146,160 @@
     } 
 </script>
 
-    <title>Page One</title>
+    <title>US Daily News</title>
+    <link
+      rel="icon"
+      href="https://cdn2.iconfinder.com/data/icons/communication-media-vol-1/512/internet_web_network_global-512.png"
+      type="image/png"
+    />
+
     <style>
-        /* Estilos básicos */
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        font-size: 18px;
+        line-height: 1.6;
+        background-color: #eaeaea; /* Slightly different background color */
+        color: #333;
+      }
+
+      @media (max-width: 480px) {
         body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            background-color: #000000;
+          font-size: 20px;
         }
+      }
 
-        h1 {
-            font-size: 25px;
-            padding-inline: 20px;
-        }
+      header {
+        background-color: #8B0000; /* Darker than the original */
+        color: white;
+        padding: 20px 0;
+        text-align: center;
+      }
 
-        header, footer {
-            background-color: #ffffff;
-            color: rgb(0, 0, 0);
-            text-align: center;
-            padding: 10px 0;
-        }
+      header h1 {
+        font-size: 2rem;
+        margin-bottom: 5px;
+      }
 
-        .timer {
-            font-family: Arial, sans-serif;
-            font-size: 22px;
-            margin: 10px 0 20px;
-            font-weight: bold;
-            text-align: center;
-            color: rgb(255, 255, 255);
-            padding-inline: 15px;
-            display: none;
-        }
+      header p {
+        font-size: 1.2rem;
+        font-style: italic;
+      }
 
-        .time {
-            color: red;
-        }
+      nav {
+        background-color: #103a6e; /* Slightly different nav color */
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        padding: 10px;
+      }
 
-        header {
-            background-color: #000000;
-        }
+      nav a {
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+      }
 
-        main {
-            flex: 1;
-            padding-bottom: 35%;
-            padding-top: -5px;
-            display: flex;
-            flex-direction: column;
-            align-items: center !important;
-            justify-content: center;
-            background-color: #000000;
-        }
+      nav a:hover {
+        text-decoration: underline;
+      }
 
-        h1 {
-            font-size: 20px;
-            padding-inline: 20px;
-            font-weight: bold;
-            color: white;
-            text-shadow: 2px 2px 4px black;
-            background-color: #000000;
-        }
+      main {
+        max-width: 900px;
+        margin: 30px auto;
+        padding: 0 20px;
+      }
 
-        .oi {
-            color: red;
-        }
+      article {
+        background: #fff;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
 
-        .container {
-            display: flex;
-            justify-content: center; /* Alinha horizontalmente ao centro */
-            align-items: center; /* Alinha verticalmente ao centro */
-            height: 100vh; /* Usa 100% da altura da viewport */
-        }
+      article h2 {
+        color: #072c59;
+        margin-bottom: 15px;
+        font-size: 1.2rem;
+        text-align: center;
+      }
 
-        .image-container {
-            display: flex !important;
-            justify-content: center; /* Alinha horizontalmente ao centro */
-        }
+      article p {
+        margin-bottom: 15px;
+        line-height: 1.6;
+      }
 
-        button {
-            padding: 10px 20px; /* Adiciona um pouco de padding ao botão */
-            font-size: 16px; /* Aumenta um pouco o tamanho da fonte */
-            cursor: pointer; /* Muda o cursor para indicar que é clicável */
-            background-color: green;
-            border-color: green;
-        }
+      .highlight {
+        font-weight: bold;
+        color: #cc0000;
+      }
 
-        a {
-            text-decoration: none; /* Remove o sublinhado do link */
-            color: rgb(0, 0, 0);
-        }
+      .featured-image {
+        display: block;
+        max-width: 100%;
+        height: auto;
+        margin: 20px auto;
+      }
 
-        img {
-            max-width: 100%;
-            padding-bottom: 50%;
-        }
+      .watch-video-btn {
+        display: block;
+        background: #cc0000;
+        margin: 20px auto;
+        color: #fff;
+        padding: 15px 20px;
+        text-decoration: none;
+        border-radius: 4px;
+        font-weight: bold;
+        text-align: center;
+        transition: background 0.3s ease;
+        font-size: 1.25rem;
+        max-width: 280px;
+      }
 
-        .rodape {
-            font-size: 8px;
-            padding-right: 10%;
-            padding-left: 10%;
-        }
+      .watch-video-btn:hover {
+        background: #aa0000;
+      }
 
-        .container-2 {
-            display: flex;
-            font-size: 10px;
-            justify-content: center; /* Centraliza horizontalmente */
-            align-items: center; /* Centraliza verticalmente */
-            height: 100px; /* Altura do container */
-        }
+      footer {
+        background-color: #000000;
+        color: white;
+        text-align: center;
+        padding: 20px;
+        margin-top: 30px;
+        font-size: 5px;
+      }
 
-        .footer-link {
-            flex: 1; /* Faz cada link ocupar o mesmo espaço */
-            text-align: center; /* Centraliza o texto dentro de cada bloco */
-            padding: 10px; /* Espaçamento interno para os links */
-            border-right: 1px solid rgb(255, 0, 0); /* Adiciona uma borda à direita */
-        }
-
-        .footer-link:last-child {
-            border-right: none; /* Remove a borda do último item */
-        }
-
-        /* Estilos responsivos para Desktop */
-        @media (min-width: 768px) {
-            main {
-                flex-direction: row;
-                align-items: flex-start;
-                padding-top: 20px;
-            }
-            img {
-                max-width: 100%;
-                padding-bottom: 50%;
-            }
-            .rodape {
-                font-size: 10px;
-                padding-right: 20%;
-                padding-left: 20%;
-            }
-            .container {
-                padding-top: 30px;
-                padding-bottom: 50px;
-            }
-            p {
-                align-items: center;
-                text-align: center;
-                font-size: 20px;
-                padding-top: -15px;
-            }
-        }
+      footer p {
+        margin: 5px 0;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
+    <header>
+      <h1>US Daily News</h1>
+      <p>Latest Highlights &amp; Health Updates</p>
+    </header>
+
+
     <main>
-<div id="vid_67d071ca632a0adc39bfc062" style="position: relative; width: 100%; padding: 176.47058823529412% 0 0;"> <img id="thumb_67d071ca632a0adc39bfc062" src="https://images.converteai.net/dc2bee22-f6b3-41ae-b28c-3a61aaac8be4/players/67d071ca632a0adc39bfc062/thumbnail.jpg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; display: block;" alt="thumbnail"> <div id="backdrop_67d071ca632a0adc39bfc062" style=" -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px); position: absolute; top: 0; height: 100%; width: 100%; "></div> </div> <script type="text/javascript" id="scr_67d071ca632a0adc39bfc062"> var s=document.createElement("script"); s.src="https://scripts.converteai.net/dc2bee22-f6b3-41ae-b28c-3a61aaac8be4/players/67d071ca632a0adc39bfc062/player.js", s.async=!0,document.head.appendChild(s); </script>
+      <article>
+        <h2>
+          Ѕ​р​е​с​і​а​l​і​ѕ​t​ ​R​е​v​е​а​l​ѕ​ <span class="highlight">​W​а​r​m​ ​W​а​t​е​r​ 
+          <br>​R​і​t​u​а​l</span>​ ​t​h​а​t​ <span class="highlight">​R​Е​V​Е​R​Ѕ​Е​Ѕ</span>​ <br>​t​у​р​е​ ​2​ ​d​і​а​b​е​t​е​ѕ​ 
+        </h2>
+        <p style="font-size: 0.7rem">
+          <strong>Publication Date:</strong> April 3, 2025
+        </p>
+
+        <div id="vid_67d071ca632a0adc39bfc062" style="position: relative; width: 100%; padding: 176.47058823529412% 0 0;"> <img id="thumb_67d071ca632a0adc39bfc062" src="https://images.converteai.net/dc2bee22-f6b3-41ae-b28c-3a61aaac8be4/players/67d071ca632a0adc39bfc062/thumbnail.jpg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; display: block;" alt="thumbnail"> <div id="backdrop_67d071ca632a0adc39bfc062" style=" -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px); position: absolute; top: 0; height: 100%; width: 100%; "></div> </div> <script type="text/javascript" id="scr_67d071ca632a0adc39bfc062"> var s=document.createElement("script"); s.src="https://scripts.converteai.net/dc2bee22-f6b3-41ae-b28c-3a61aaac8be4/players/67d071ca632a0adc39bfc062/player.js", s.async=!0,document.head.appendChild(s); </script>
+
+        
+      </article>
     </main>
     <footer>
         <div class="rodape">
