@@ -17,18 +17,26 @@
     <link rel="dns-prefetch" href="https://api.vturb.com.br">
   
     <script>
-    // Obtém os parâmetros da URL
+    // ─────────── Obtém os parâmetros da URL ───────────
     const params = new URLSearchParams(window.location.search);
 
-    // Primeiro tenta 'rtkcid'
-    let clickid = params.get("rtkcid");
-    // Se não encontrar, tenta 'ref_id'
-    if (!clickid) {
-      clickid = params.get("ref_id");
-    }
+    /*  tenta, na ordem:
+    1) rtkcid  (Google/Facebook template do RedTrack)
+    2) ref_id  (link que você mostrou do TikTok)
+    3) ttclid  (macro oficial do TikTok)
+    4) clickid (genérico, caso use outra fonte)       */
+    let clickid =
+      params.get('rtkcid') ||
+      params.get('ref_id') ||
+      params.get('ttclid') ||
+      params.get('clickid');
 
-    const rdtk_event_id = params.get("ip");
+    /*  se você quiser um event‑id extra, aproveite o mesmo fallback   */
+    const rdtk_event_id =
+      params.get('ip') || params.get('ttclid') || '';
 
+    console.log('DEBUG – clickid capturado:', clickid);   // mantenha para testar
+        
     function startOfferTimer() {
         console.log('startOfferTimer iniciado');
         var e, t;
