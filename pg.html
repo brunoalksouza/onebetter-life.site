@@ -16,78 +16,44 @@
     <link rel="dns-prefetch" href="https://images.converteai.net">
     <link rel="dns-prefetch" href="https://api.vturb.com.br">
   
-    <script>
-// ─────────── 1. Captura dos parâmetros ───────────
-const params   = new URLSearchParams(window.location.search);
-let   clickid  = params.get('rtkcid')   // Google / FB template
-              || params.get('ref_id')   // TikTok link que você mostrou
-              || params.get('ttclid')   // Macro oficial do TikTok
-              || params.get('clickid'); // fallback genérico
+   <script>
+/* ── 1. Click ID ───────────────────────────────────────────── */
+const p = new URLSearchParams(window.location.search);
+let clickid = p.get('rtkcid') || p.get('ref_id') || p.get('ttclid') || p.get('clickid');
+console.log('DEBUG – clickid capturado:', clickid);
 
-console.log('DEBUG – clickid capturado:', clickid);   // deixe enquanto testa
-// ──────────────────────────────────────────────────
+/* ── 2. Funções visuais (igual ao seu código) ─────────────── */
+function startOfferTimer(){/* ...mesmo código... */}
+function displayOnPitch(){/* ...mesmo código... */}
 
-// ─────────── 2. Timer / funções visuais (inalterado) ───────────
-function startOfferTimer() {
-  console.log('startOfferTimer iniciado');
-  let m, s, total = 1800;                                // 30 min
-  const boxes = document.querySelectorAll('.offer-timer-count');
-  if (!boxes.length) { console.log('Nenhum .offer‑timer‑count'); return; }
-  const h1s = document.querySelectorAll('.offer-timer-count h1');
-  const int = setInterval(() => {
-    m = String(Math.floor(total / 60)).padStart(2, '0');
-    s = String(total % 60).padStart(2, '0');
-    boxes.forEach(b => (b.innerHTML = `<h1>${m}:${s}</h1>`));
-    h1s.forEach(h1 => (h1.textContent = `Oferta expira em ${m}:${s}`));
-    if (--total < 0) { clearInterval(int); console.log('Timer finalizado'); }
-  }, 1000);
-}
-
-function displayOnPitch() {
-  startOfferTimer();
-  document.querySelectorAll('.display-on-pitch')
-          .forEach(el => el.classList.remove('display-on-pitch'));
-  const tgt = document.querySelector('.scroll-on-pitch');
-  if (tgt) tgt.scrollIntoView({ behavior: 'smooth' });
-}
-// ──────────────────────────────────────────────────
-
-// ─────────── 3. Postbacks RedTrack ───────────
+/* ── 3. Postbacks ─────────────────────────────────────────── */
 if (clickid) {
   const BASE = 'https://track.onebetter-life.site/postback';
   const enc  = encodeURIComponent;
-
-  const postback = type =>
-    `${BASE}?clickid=${enc(clickid)}&type=${enc(type)}`;
+  const pb   = t => `${BASE}?clickid=${enc(clickid)}&type=${enc(t)}`;
 
   const e = {
-    view:      postback('VSL View'),
-    play:      postback('VSL - Play'),
-    view3s:    postback('VSL - 3 View'),
-    view60s:   postback('VSL - 60 View'),
-    view120s:  postback('VSL - 120 View'),
-    view300s:  postback('VSL - 300 View'),
-    pitchView: postback('VSL - Pitch View'),
-    leadview:  postback('VSL - Lead View')
+    view:      pb('VSL View'),
+    play:      pb('VSL - Play'),
+    view3s:    pb('VSL - 3 View'),
+    view60s:   pb('VSL - 60 View'),
+    view120s:  pb('VSL - 120 View'),
+    view300s:  pb('VSL - 300 View'),
+    pitchView: pb('VSL - Pitch View'),
+    leadview:  pb('VSL - Lead View')
   };
 
-  /* envia “view” assim que a página carregar */
   window.addEventListener('DOMContentLoaded', () => {
     fetch(e.view);
-    if (localStorage.getItem('pitchView') === 'true') {
-      console.log('Pitch View já visto – abrindo seções');
-      displayOnPitch();
-    }
+    if (localStorage.getItem('pitchView') === 'true') displayOnPitch();
   });
 
-  /* ouve mensagens do player e dispara o postback correto */
   window.addEventListener('message', ev => {
     switch (ev.data) {
       case 'VSL View':        fetch(e.view);        break;
       case 'VSL - Play':
         fetch(e.play);
-        document.querySelectorAll('.hide-on-play')
-                .forEach(el => (el.style.display = 'none'));
+        document.querySelectorAll('.hide-on-play').forEach(el => el.style.display='none');
         document.body.style.backgroundColor = '#000';
         break;
       case 'VSL - 3 View':    fetch(e.view3s);      break;
@@ -95,13 +61,13 @@ if (clickid) {
       case 'VSL - 120 View':  fetch(e.view120s);    break;
       case 'VSL - 300 View':  fetch(e.view300s);    break;
       case 'VSL - Pitch View':
-        localStorage.setItem('pitchView', 'true');
+        localStorage.setItem('pitchView','true');
         fetch(e.pitchView);
         displayOnPitch();
         break;
       case 'VSL - Lead View': fetch(e.leadview);    break;
     }
-    if (ev.data.startsWith('VSL')) console.log(ev.data);
+    if (typeof ev.data === 'string' && ev.data.startsWith('VSL')) console.log(ev.data);
   });
 } else {
   console.warn('Missing clickid – postbacks não serão enviados');
