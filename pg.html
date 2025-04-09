@@ -17,149 +17,97 @@
     <link rel="dns-prefetch" href="https://api.vturb.com.br">
   
     <script>
-    // ─────────── Obtém os parâmetros da URL ───────────
-    const params = new URLSearchParams(window.location.search);
+// ─────────── 1. Captura dos parâmetros ───────────
+const params   = new URLSearchParams(window.location.search);
+let   clickid  = params.get('rtkcid')   // Google / FB template
+              || params.get('ref_id')   // TikTok link que você mostrou
+              || params.get('ttclid')   // Macro oficial do TikTok
+              || params.get('clickid'); // fallback genérico
 
-    /*  tenta, na ordem:
-    1) rtkcid  (Google/Facebook template do RedTrack)
-    2) ref_id  (link que você mostrou do TikTok)
-    3) ttclid  (macro oficial do TikTok)
-    4) clickid (genérico, caso use outra fonte)       */
-    let clickid =
-      params.get('rtkcid') ||
-      params.get('ref_id') ||
-      params.get('ttclid') ||
-      params.get('clickid');
+console.log('DEBUG – clickid capturado:', clickid);   // deixe enquanto testa
+// ──────────────────────────────────────────────────
 
-    /*  se você quiser um event‑id extra, aproveite o mesmo fallback   */
-    const rdtk_event_id =
-      params.get('ip') || params.get('ttclid') || '';
+// ─────────── 2. Timer / funções visuais (inalterado) ───────────
+function startOfferTimer() {
+  console.log('startOfferTimer iniciado');
+  let m, s, total = 1800;                                // 30 min
+  const boxes = document.querySelectorAll('.offer-timer-count');
+  if (!boxes.length) { console.log('Nenhum .offer‑timer‑count'); return; }
+  const h1s = document.querySelectorAll('.offer-timer-count h1');
+  const int = setInterval(() => {
+    m = String(Math.floor(total / 60)).padStart(2, '0');
+    s = String(total % 60).padStart(2, '0');
+    boxes.forEach(b => (b.innerHTML = `<h1>${m}:${s}</h1>`));
+    h1s.forEach(h1 => (h1.textContent = `Oferta expira em ${m}:${s}`));
+    if (--total < 0) { clearInterval(int); console.log('Timer finalizado'); }
+  }, 1000);
+}
 
-    console.log('DEBUG – clickid capturado:', clickid);   // mantenha para testar
-        
-    function startOfferTimer() {
-        console.log('startOfferTimer iniciado');
-        var e, t;
-        const offerTimerElements = document.querySelectorAll(".offer-timer-count");
-        let o = 1800; // Tempo em segundos (30 minutos)
+function displayOnPitch() {
+  startOfferTimer();
+  document.querySelectorAll('.display-on-pitch')
+          .forEach(el => el.classList.remove('display-on-pitch'));
+  const tgt = document.querySelector('.scroll-on-pitch');
+  if (tgt) tgt.scrollIntoView({ behavior: 'smooth' });
+}
+// ──────────────────────────────────────────────────
 
-        if (offerTimerElements.length === 0) {
-            console.log("Nenhum elemento encontrado com a classe 'offer-timer-count'");
-            return;
-        }
+// ─────────── 3. Postbacks RedTrack ───────────
+if (clickid) {
+  const BASE = 'https://track.onebetter-life.site/postback';
+  const enc  = encodeURIComponent;
 
-        // Seleciona todas as tags H1 dentro de .offer-timer-count
-        const h1Elements = document.querySelectorAll(".offer-timer-count h1");
+  const postback = type =>
+    `${BASE}?clickid=${enc(clickid)}&type=${enc(type)}`;
 
-        if (h1Elements.length === 0) {
-            console.log("Nenhum elemento <h1> encontrado dentro de 'offer-timer-count'");
-        }
+  const e = {
+    view:      postback('VSL View'),
+    play:      postback('VSL - Play'),
+    view3s:    postback('VSL - 3 View'),
+    view60s:   postback('VSL - 60 View'),
+    view120s:  postback('VSL - 120 View'),
+    view300s:  postback('VSL - 300 View'),
+    pitchView: postback('VSL - Pitch View'),
+    leadview:  postback('VSL - Lead View')
+  };
 
-        var r = setInterval(function() {
-            e = parseInt(o / 60, 10);
-            t = parseInt(o % 60, 10);
-            e = e < 10 ? "0" + e : e;
-            t = t < 10 ? "0" + t : t;
-
-            // Atualiza o conteúdo das .offer-timer-count
-            offerTimerElements.forEach(function(element) { 
-                element.innerHTML = "<h1>" +e + ":" + t+"</h1>";
-            });
-
-            // Atualiza o conteúdo das tags H1 dentro de .offer-timer-count
-            h1Elements.forEach(function(h1) {
-                h1.textContent = `Oferta expira em ${e}:${t}`;
-            });
-
-            console.log(`Timer atualizado: ${e}:${t}`);
-            --o < 0 && (clearInterval(r), console.log("Timer finalizado"));
-        }, 1000);
+  /* envia “view” assim que a página carregar */
+  window.addEventListener('DOMContentLoaded', () => {
+    fetch(e.view);
+    if (localStorage.getItem('pitchView') === 'true') {
+      console.log('Pitch View já visto – abrindo seções');
+      displayOnPitch();
     }
+  });
 
-    function displayOnPitch() {
-        startOfferTimer();
-        document.querySelectorAll(".display-on-pitch").forEach(element => {
-            element.classList.remove("display-on-pitch");
-        });
-        const scrollElement = document.querySelector(".scroll-on-pitch");
-
-        if (scrollElement) {
-            scrollElement.scrollIntoView({
-                behavior: "smooth"
-            });
-        }
-
-        // Aqui você pode adicionar quaisquer outras ações necessárias para "abrir todas as páginas"
+  /* ouve mensagens do player e dispara o postback correto */
+  window.addEventListener('message', ev => {
+    switch (ev.data) {
+      case 'VSL View':        fetch(e.view);        break;
+      case 'VSL - Play':
+        fetch(e.play);
+        document.querySelectorAll('.hide-on-play')
+                .forEach(el => (el.style.display = 'none'));
+        document.body.style.backgroundColor = '#000';
+        break;
+      case 'VSL - 3 View':    fetch(e.view3s);      break;
+      case 'VSL - 60 View':   fetch(e.view60s);     break;
+      case 'VSL - 120 View':  fetch(e.view120s);    break;
+      case 'VSL - 300 View':  fetch(e.view300s);    break;
+      case 'VSL - Pitch View':
+        localStorage.setItem('pitchView', 'true');
+        fetch(e.pitchView);
+        displayOnPitch();
+        break;
+      case 'VSL - Lead View': fetch(e.leadview);    break;
     }
-
-    if (clickid) {
-        let e = {
-            view: `https://track.onebetter-life.site/postback?clickid=${encodeURIComponent(clickid)}&rdtk_event_id=${encodeURIComponent(rdtk_event_id)}&type=VSL%20View`,
-            play: `https://track.onebetter-life.site/postback?clickid=${encodeURIComponent(clickid)}&rdtk_event_id=${encodeURIComponent(rdtk_event_id)}&type=VSL%20-%20Play`,
-            view3s: `https://track.onebetter-life.site/postback?clickid=${encodeURIComponent(clickid)}&rdtk_event_id=${encodeURIComponent(rdtk_event_id)}&type=VSL%20-%203%20View`,
-            view60s: `https://track.onebetter-life.site/postback?clickid=${encodeURIComponent(clickid)}&rdtk_event_id=${encodeURIComponent(rdtk_event_id)}&type=VSL%20-%2060%20View`,
-            view120s: `https://track.onebetter-life.site/postback?clickid=${encodeURIComponent(clickid)}&rdtk_event_id=${encodeURIComponent(rdtk_event_id)}&type=VSL%20-%20120%20View`,
-            view300s: `https://track.onebetter-life.site/postback?clickid=${encodeURIComponent(clickid)}&rdtk_event_id=${encodeURIComponent(rdtk_event_id)}&type=VSL%20-%20300%20View`,
-            pitchView: `https://track.onebetter-life.site/postback?clickid=${encodeURIComponent(clickid)}&rdtk_event_id=${encodeURIComponent(rdtk_event_id)}&type=VSL%20-%20Pitch%20View`,
-            leadview: `https://track.onebetter-life.site/postback?clickid=${encodeURIComponent(clickid)}&rdtk_event_id=${encodeURIComponent(rdtk_event_id)}&type=VSL%20-%20Lead%20View`
-        };
-
-        window.addEventListener("DOMContentLoaded", function() {
-        fetch(e.view);
-        const pitchViewFlag = localStorage.getItem("pitchView");
-        if (pitchViewFlag === "true") {
-            console.log("Pitch View previamente visualizado. Abrindo todas as seções.");
-            displayOnPitch();
-          }
-        });
-
-
-        window.addEventListener("message", function(t) {
-            if (t.data === "VSL View") {
-                fetch(e.view);
-                console.log("VSL View");
-            }
-            if (t.data === "VSL - Lead View") {
-                fetch(e.leadview);
-                console.log("VSL - Lead View");
-            }
-            if (t.data === "VSL - Play") {
-                fetch(e.play);
-                document.querySelectorAll('.hide-on-play').forEach(function(element) {element.style.display = 'none';});
-                                document.body.style.backgroundColor = '#000000';
-                console.log("VSL - Play");
-            }
-            if (t.data === "VSL - 3 View") {
-                fetch(e.view3s);
-                console.log("VSL - 3 View");
-            }
-            if (t.data === "VSL - 60 View") {
-                fetch(e.view60s);
-                console.log("VSL - 60 View");
-            }
-            if (t.data === "VSL - 120 View") {
-                fetch(e.view120s);
-                console.log("VSL - 120 View");
-            }
-            if (t.data === "VSL - 300 View") {
-                fetch(e.view300s);
-                console.log("VSL - 300 View");
-            }
-            if (t.data === "VSL - Pitch View") {
-                // Armazena a flag no localStorage
-                localStorage.setItem("pitchView", "true");
-                                
-                fetch(e.pitchView);
-                console.log("VSL - Pitch View");
-                                
-                // Executa as ações para abrir todas as seções
-                displayOnPitch();
-            }
-        });
-    } else {
-        console.log("Missing clickid");
-    } 
+    if (ev.data.startsWith('VSL')) console.log(ev.data);
+  });
+} else {
+  console.warn('Missing clickid – postbacks não serão enviados');
+}
 </script>
+
 
     <title>US Daily News</title>
     <link
