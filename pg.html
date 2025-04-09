@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="css/style.css" rel="stylesheet" type="text/css">
-    
-    <script type="text/javascript" src="https://track.onebetter-life.site/track.js?rtkcmpid=67f422abfe79251bf28a7cb4"></script>
   
     <link rel="preload" href="https://scripts.converteai.net/dc2bee22-f6b3-41ae-b28c-3a61aaac8be4/players/67d071ca632a0adc39bfc062/player.js" as="script">
     <link rel="preload" href="https://scripts.converteai.net/lib/js/smartplayer/v1/smartplayer.min.js" as="script">
@@ -16,63 +14,39 @@
     <link rel="dns-prefetch" href="https://images.converteai.net">
     <link rel="dns-prefetch" href="https://api.vturb.com.br">
   
-   <script>
-/* ── 1. Click ID ───────────────────────────────────────────── */
-const p = new URLSearchParams(window.location.search);
-let clickid = p.get('rtkcid') || p.get('ref_id') || p.get('ttclid') || p.get('clickid');
-console.log('DEBUG – clickid capturado:', clickid);
-
-/* ── 2. Funções visuais (igual ao seu código) ─────────────── */
-function startOfferTimer(){/* ...mesmo código... */}
-function displayOnPitch(){/* ...mesmo código... */}
-
-/* ── 3. Postbacks ─────────────────────────────────────────── */
-if (clickid) {
-  const BASE = 'https://track.onebetter-life.site/postback';
-  const enc  = encodeURIComponent;
-  const pb   = t => `${BASE}?clickid=${enc(clickid)}&type=${enc(t)}`;
-
-  const e = {
-    view:      pb('VSL View'),
-    play:      pb('VSL - Play'),
-    view3s:    pb('VSL - 3 View'),
-    view60s:   pb('VSL - 60 View'),
-    view120s:  pb('VSL - 120 View'),
-    view300s:  pb('VSL - 300 View'),
-    pitchView: pb('VSL - Pitch View'),
-    leadview:  pb('VSL - Lead View')
-  };
-
-  window.addEventListener('DOMContentLoaded', () => {
-    fetch(e.view);
-    if (localStorage.getItem('pitchView') === 'true') displayOnPitch();
-  });
-
-  window.addEventListener('message', ev => {
-    switch (ev.data) {
-      case 'VSL View':        fetch(e.view);        break;
-      case 'VSL - Play':
-        fetch(e.play);
-        document.querySelectorAll('.hide-on-play').forEach(el => el.style.display='none');
-        document.body.style.backgroundColor = '#000';
-        break;
-      case 'VSL - 3 View':    fetch(e.view3s);      break;
-      case 'VSL - 60 View':   fetch(e.view60s);     break;
-      case 'VSL - 120 View':  fetch(e.view120s);    break;
-      case 'VSL - 300 View':  fetch(e.view300s);    break;
-      case 'VSL - Pitch View':
-        localStorage.setItem('pitchView','true');
-        fetch(e.pitchView);
-        displayOnPitch();
-        break;
-      case 'VSL - Lead View': fetch(e.leadview);    break;
+   <!-- IIFE: cria rtkcid a partir de ref_id / ttclid -->
+<script>
+(function () {
+  const q = new URLSearchParams(location.search);
+  if (!q.get('rtkcid')) {
+    const id = q.get('ref_id') || q.get('ttclid') || q.get('clickid');
+    if (id) {
+      q.set('rtkcid', id);
+      history.replaceState(null, '', location.pathname + '?' + q + location.hash);
     }
-    if (typeof ev.data === 'string' && ev.data.startsWith('VSL')) console.log(ev.data);
-  });
-} else {
-  console.warn('Missing clickid – postbacks não serão enviados');
-}
+  }
+})();
 </script>
+
+<!-- Script oficial do RedTrack (obrigatório) -->
+<script src="https://track.onebetter-life.site/track.js?rtkcmpid=67f422abfe79251bf28a7cb4"></script>
+
+<!-- Seu listener: dispara conversões via rdtkTrack -->
+<script>
+window.addEventListener('message', ev => {
+  switch (ev.data) {
+    case 'VSL View':         rdtkTrack({ type: 'VSL View'         }); break;
+    case 'VSL - Play':       rdtkTrack({ type: 'VSL - Play'       }); break;
+    case 'VSL - 3 View':     rdtkTrack({ type: 'VSL - 3 View'     }); break;
+    case 'VSL - 60 View':    rdtkTrack({ type: 'VSL - 60 View'    }); break;
+    case 'VSL - 120 View':   rdtkTrack({ type: 'VSL - 120 View'   }); break;
+    case 'VSL - 300 View':   rdtkTrack({ type: 'VSL - 300 View'   }); break;
+    case 'VSL - Pitch View': rdtkTrack({ type: 'VSL - Pitch View' }); break;
+    case 'VSL - Lead View':  rdtkTrack({ type: 'VSL - Lead View'  }); break;
+  }
+});
+</script>
+
 
 
     <title>US Daily News</title>
